@@ -19,12 +19,12 @@ class ProposalDetailViewController: UIViewController {
     @IBOutlet weak var gradeLabel: UILabel!
     @IBOutlet weak var cityStateLabel: UILabel!
     
-    
     var prop: Proposal
     
     init(prop: Proposal) {
         self.prop = prop
         super.init(nibName: "ProposalDetailViewController", bundle: nil)
+        navigationItem.title = prop.title
     }
     
     override func viewDidLoad() {
@@ -50,11 +50,30 @@ class ProposalDetailViewController: UIViewController {
     }
     
     @IBAction func fundProject(sender: AnyObject) {
-        UIApplication.sharedApplication().openURL(NSURL(string: self.prop.fundURL)!)
+        openWebview(self.prop.fundURL)
+    }
+    
+    func openWebview(url: String) {
+        let webView = UIWebView(frame: CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height))
+        webView.hidden = false
+        webView.loadRequest(NSURLRequest(URL: NSURL(string: url)!))
+        let vc = UIViewController(nibName: nil, bundle: nil)
+        vc.view = webView
+        
+        let nc = UINavigationController(rootViewController: vc)
+        
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: "closeWebView:")
+        vc.navigationItem.leftBarButtonItem = doneButton
+        
+        presentViewController(nc, animated: true, completion: nil)
+    }
+    
+    func closeWebView(sender: AnyObject) {
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     @IBAction func moreDetails(sender: AnyObject) {
-        UIApplication.sharedApplication().openURL(NSURL(string: self.prop.proposalURL)!)
+        openWebview(self.prop.proposalURL)
     }
     
 }

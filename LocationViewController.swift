@@ -8,8 +8,12 @@
 
 import UIKit
 
-class LocationViewController: UIViewController {
+class LocationViewController: UIViewController, UITextFieldDelegate {
     let locHelper = LocationHelper()
+    
+    var cancelClosure: (() -> ())?
+    var useCurrentLocationClosure: ((lat: Double, lng: Double) -> ())?
+    var useZipCodeClosure: ((zip: String) -> ())?
     
     @IBOutlet weak var zipField: UITextField!
     
@@ -19,8 +23,27 @@ class LocationViewController: UIViewController {
         
     }
     
-    convenience override init() {
-        self.init(nibName: nil, bundle: nil)
+    convenience init(hasLoc: Bool) {
+        let appBundle = NSBundle.mainBundle()
+        self.init(nibName: "LocationViewController", bundle: appBundle)
+        if hasLoc {
+            let cancelItem = UIBarButtonItem(barButtonSystemItem: .Cancel, target: self, action: "cancel:")
+            navigationItem.leftBarButtonItem = cancelItem
+        }
+        
+    }
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        
+        let zip = zipField!.text
+        self.useZipCodeClosure?(zip: zip)
+        
+        return true
+    }
+    
+    func cancel(sender: AnyObject) {
+        self.cancelClosure?()
     }
     
     required init(coder aDecoder: NSCoder) {
@@ -52,8 +75,8 @@ class LocationViewController: UIViewController {
             if let longitude: Double = userInfo["lng"] as? Double {
                 lng = longitude
             }
-            let propsVC = ProposalsViewController(lat: lat!, lng: lng!, zip: nil)
-            navigationController?.pushViewController(propsVC, animated: true)
+
+            self.useCurrentLocationClosure?(lat: lat!, lng: lng!)
         }
     }
 
@@ -63,15 +86,8 @@ class LocationViewController: UIViewController {
     
     @IBAction func submitZipCode(sender: AnyObject) {
         let zip = zipField!.text
-        let propsVC = ProposalsViewController(lat: nil, lng: nil, zip: zip)
-        navigationController?.pushViewController(propsVC, animated: true)
+        self.useZipCodeClosure?(zip: zip)
     }
-    
-//    func textFieldShouldReturn(textField: UITextField) -> Bool {
-//        println("HERE")
-//        return true
-//    }
-    
 
     /*
     // MARK: - Navigation

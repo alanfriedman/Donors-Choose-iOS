@@ -12,24 +12,24 @@ import CoreData
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    var window: UIWindow?
+    var window: UIWindow = UIWindow(frame: UIScreen.mainScreen().bounds)
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         
-//        let homeViewController: HomeViewController = HomeViewController()
+        NSHTTPCookieStorage.sharedHTTPCookieStorage().cookieAcceptPolicy = NSHTTPCookieAcceptPolicy.Always
         
         let appBundle = NSBundle.mainBundle()
         
-        let locViewController: LocationViewController = LocationViewController(nibName: "LocationViewController", bundle: appBundle)
+        let propViewController: ProposalsViewController = ProposalsViewController(nibName: "ProposalsViewController", bundle: appBundle)
         
-        let navigationController = UINavigationController(rootViewController: locViewController)
+        let navigationController = UINavigationController(rootViewController: propViewController)
         
-        self.window!.rootViewController = navigationController
+        self.window.rootViewController = navigationController
         
-        self.window!.backgroundColor = UIColor.whiteColor()
-        self.window!.makeKeyAndVisible()
+        self.window.backgroundColor = UIColor.whiteColor()
+        self.window.makeKeyAndVisible()
         
         return true
     }

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B36095AF1ABB56B200635477 /* ProposalsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B36095AE1ABB56B200635477 /* ProposalsViewController.xib */; };
+		B36095B41ABB5A5700635477 /* ProposalsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36095B21ABB5A5700635477 /* ProposalsTableViewCell.swift */; };
+		B36095B51ABB5A5700635477 /* ProposalsTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B36095B31ABB5A5700635477 /* ProposalsTableViewCell.xib */; };
 		B381503B1AB71CEC00B2CFB6 /* LocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B381503A1AB71CEC00B2CFB6 /* LocationHelper.swift */; };
 		B38151101AB7BBA800B2CFB6 /* Proposal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B381510F1AB7BBA800B2CFB6 /* Proposal.swift */; };
 		B39E8D941AB89E3300DF345B /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39E8D931AB89E3300DF345B /* LocationViewController.swift */; };
@@ -33,6 +36,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B36095AE1ABB56B200635477 /* ProposalsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProposalsViewController.xib; sourceTree = "<group>"; };
+		B36095B21ABB5A5700635477 /* ProposalsTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProposalsTableViewCell.swift; sourceTree = "<group>"; };
+		B36095B31ABB5A5700635477 /* ProposalsTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProposalsTableViewCell.xib; sourceTree = "<group>"; };
 		B381503A1AB71CEC00B2CFB6 /* LocationHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationHelper.swift; sourceTree = "<group>"; };
 		B381510F1AB7BBA800B2CFB6 /* Proposal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Proposal.swift; sourceTree = "<group>"; };
 		B39E8D931AB89E3300DF345B /* LocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocationViewController.swift; path = ../LocationViewController.swift; sourceTree = "<group>"; };
@@ -102,6 +108,9 @@
 				B39E8D9B1AB8B49E00DF345B /* ProposalDetailViewController.swift */,
 				B39E8D9C1AB8B49E00DF345B /* ProposalDetailViewController.xib */,
 				B39E8D971AB8A9FA00DF345B /* ProposalsViewController.swift */,
+				B36095B21ABB5A5700635477 /* ProposalsTableViewCell.swift */,
+				B36095B31ABB5A5700635477 /* ProposalsTableViewCell.xib */,
+				B36095AE1ABB56B200635477 /* ProposalsViewController.xib */,
 				B39E8D931AB89E3300DF345B /* LocationViewController.swift */,
 				B39E8D951AB89E9400DF345B /* LocationViewController.xib */,
 				B381510E1AB7BB8E00B2CFB6 /* Model */,
@@ -231,6 +240,8 @@
 			files = (
 				B3A3EC021AB4C03C0060767E /* LaunchScreen.xib in Resources */,
 				B39E8D961AB89E9400DF345B /* LocationViewController.xib in Resources */,
+				B36095B51ABB5A5700635477 /* ProposalsTableViewCell.xib in Resources */,
+				B36095AF1ABB56B200635477 /* ProposalsViewController.xib in Resources */,
 				B39E8D9E1AB8B49E00DF345B /* ProposalDetailViewController.xib in Resources */,
 				B3A3EBFF1AB4C03C0060767E /* Images.xcassets in Resources */,
 			);
@@ -256,6 +267,7 @@
 				B39E8D9D1AB8B49E00DF345B /* ProposalDetailViewController.swift in Sources */,
 				B3A3EC1B1AB4C41A0060767E /* URLRequestHelper.swift in Sources */,
 				B3A3EBF51AB4C03C0060767E /* AppDelegate.swift in Sources */,
+				B36095B41ABB5A5700635477 /* ProposalsTableViewCell.swift in Sources */,
 				B3A3EBF81AB4C03C0060767E /* Donors_Choose.xcdatamodeld in Sources */,
 				B38151101AB7BBA800B2CFB6 /* Proposal.swift in Sources */,
 			);
@@ -374,9 +386,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "Donors Choose/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -384,9 +398,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "Donors Choose/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

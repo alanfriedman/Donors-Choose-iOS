@@ -7,13 +7,13 @@
 //
 
 import Foundation
+import UIKit
 
-struct Proposal {
+struct Proposal: Equatable {
     
     var fundURL: String
     var title: String
     var description: String
-    var thumb: String
     var schoolName: String
     var city: String
     var state: String
@@ -24,5 +24,15 @@ struct Proposal {
     var proposalURL: String
     var teacherName: String
     var thumbImageURL: String
+    var imageURL: String
+    var thumbImage: UIImage?
     
+}
+
+func ==(lhs: Proposal, rhs: Proposal) -> Bool {
+    if lhs.title == rhs.title {
+        return true
+    } else {
+        return false
+    }
 }

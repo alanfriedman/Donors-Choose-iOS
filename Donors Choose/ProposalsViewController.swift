@@ -10,59 +10,94 @@ import UIKit
 
 class ProposalsViewController: UITableViewController {
     
-    let lat: Double?
-    let lng: Double?
-    let zipCode: Int?
+    var lat: Double?
+    var lng: Double?
+    var zipCode: String?
     
     var locHelper: LocationHelper = LocationHelper()
     var latlng: [Float]? = nil
     
-    var proposals: [Proposal] = [] {
-        didSet {
-//            self.tableView.reloadData()
-//            self.tableView.endUpdates()
-        }
-    }
+    var activityView: UIActivityIndicatorView = UIActivityIndicatorView()
+    
+    var proposals: [Proposal] = []
+    
+    var images: [UIImage] = []
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
-        super.init(nibName: nil, bundle: nil)
+        
+        let appBundle = NSBundle.mainBundle()
+        super.init(nibName: nibNameOrNil, bundle: appBundle)
+        
+        navigationItem.title = "Proposals"
+        
+        let locButton = UIBarButtonItem(title: "Location", style: UIBarButtonItemStyle.Plain, target: self, action: "openLocationView:")
+        self.navigationItem.leftBarButtonItem = locButton
+        
+        self.tableView.rowHeight = 55
     }
     
-    init(lat: Double?, lng: Double?, zip: String?) {
-        super.init(style: .Plain)
-//        self.lat = lat
-//        self.lng = lng
-        getProposals(lat, lng: lng, zip: zip)
+    func startActivityIndicator() {
+        activityView.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
+        
+        activityView.hidden = false
+        activityView.startAnimating()
+        
+        let loaderButton = UIBarButtonItem(customView: activityView)
+        navigationItem.rightBarButtonItem = loaderButton
     }
     
-//    convenience init(zip: Int) {
-//        self.init(lat: nil, lng: nil, zip: zip)
-//        
-//        getProposals(nil, lng: nil, zip: zip)
-//    }
-
+    func openLocationView(sender: AnyObject) {
+        let hasLoc: Bool = lat != nil || zipCode != nil
+        openLocView(hasLoc)
+    }
+    
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.tableFooterView = UIView(frame: CGRectZero)
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        let hasLoc: Bool = lat != nil || zipCode != nil
+        if !hasLoc {
+            openLocView(hasLoc)
+        }
+    }
+    
+    func openLocView(hasLoc: Bool) {
+        let locViewController = LocationViewController(hasLoc: hasLoc)
         
-        self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "UITableViewCell")
+        locViewController.useCurrentLocationClosure = {
+            (lat: Double, lng: Double) in
+            self.lat = lat
+            self.lng = lng
+            self.getProposals(lat, lng: lng, zip: nil)
+            self.startActivityIndicator()
+            self.dismissViewControllerAnimated(true, completion: nil)
+        }
         
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        locViewController.useZipCodeClosure = {
+            (zip: String) in
+            self.zipCode = zip
+            self.getProposals(nil, lng: nil, zip: zip)
+            self.startActivityIndicator()
+            self.dismissViewControllerAnimated(true, completion: nil)
+        }
         
-//        NSNotificationCenter.defaultCenter().addObserver(self, selector: "locationChanged:", name:"locationChanged", object: nil)
-//        locHelper.getUserLocation()
+        locViewController.cancelClosure = {
+            self.dismissViewControllerAnimated(true, completion: nil)
+        }
+        
+        let locNC = UINavigationController(rootViewController: locViewController)
+        
+        presentViewController(locNC, animated: true, completion: nil)
     }
     
     func getProposals(lat: Double?, lng: Double?, zip: String?) {
-//        var params: [String:AnyObject] = ["keywords": "30324", "APIKey": "DONORSCHOOSE"]
-        
+
         var qStr: String = ""
         if let lat1 = lat {
             if let lng1 = lng {
@@ -72,19 +107,21 @@ class ProposalsViewController: UITableViewController {
             qStr = "keywords=\(zip!)&APIKey=DONORSCHOOSE&max=50&sortBy=1"
         }
         
-        urlRequestHelper.performHTTPRequest("api.donorschoose.org", path: "/common/json_feed.html", query: qStr, method: "GET", params: nil) {
-            (json) -> Void in
+        urlRequestHelper.performHTTPRequest("api.donorschoose.org", path: "/common/json_feed.html", query: qStr, method: "GET", params: nil, {
+            (json) -> () in
 
+            self.activityView.stopAnimating()
+
+            self.proposals = []
+            
             if let props = json["proposals"] as? NSArray {
                 for prop in props {
                     let fundURL: String = prop["fundURL"] as? String ?? ""
                     let title: String = prop["title"] as? String ?? ""
                     let shortDescription: String = prop["shortDescription"] as? String ?? ""
-                    let thumb: String = prop["thumb"] as? String ?? ""
                     let schoolName: String = prop["schoolName"] as? String ?? ""
                     let city: String = prop["city"] as? String ?? ""
                     let state: String = prop["state"] as? String ?? ""
-                    
                     let miniDescription: String = prop["fulfillmentTrailer"] as? String ?? ""
                     let costToComplete: String = prop["costToComplete"] as? String ?? "0.00"
                     let totalPrice: String = prop["totalPrice"] as? String ?? "0.00"
@@ -97,17 +134,17 @@ class ProposalsViewController: UITableViewController {
                     let proposalURL: String = prop["proposalURL"] as? String ?? ""
                     let teacherName: String = prop["teacherName"] as? String ?? ""
                     let thumbImageURL: String = prop["thumbImageURL"] as? String ?? ""
+                    let imageURL: String = prop["imageURL"] as? String ?? ""
                     
-                    let prop = Proposal(fundURL: fundURL, title: title, description: shortDescription, thumb: thumb, schoolName: schoolName, city: city, state: state, miniDescription: miniDescription, costToComplete: costToComplete, totalPrice: totalPrice, gradeName: gradeName!, proposalURL: proposalURL, teacherName: teacherName, thumbImageURL: thumbImageURL)
+                    let prop = Proposal(fundURL: fundURL, title: title, description: shortDescription, schoolName: schoolName, city: city, state: state, miniDescription: miniDescription, costToComplete: costToComplete, totalPrice: totalPrice, gradeName: gradeName!, proposalURL: proposalURL, teacherName: teacherName, thumbImageURL: thumbImageURL, imageURL: imageURL, thumbImage: nil)
                     
                     self.proposals.append(prop)
                 }
                 
                 self.tableView.reloadData()
                 self.tableView.endUpdates()
-//                self.proposals = props
             }
-        }
+        })
         
     }
 
@@ -130,31 +167,53 @@ class ProposalsViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        var cell = tableView.dequeueReusableCellWithIdentifier("UITableViewCell") as UITableViewCell!
-        
-//        var cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath) as UITableViewCell?
-
-//        if cell == nil {
-        cell = UITableViewCell(style:UITableViewCellStyle.Subtitle, reuseIdentifier:"UITableViewCell")
-//        }
-//        self.configureCell(cell, atIndexPath: indexPath)
-        
-        let prop: Proposal = self.proposals[indexPath.row]
-        var title: String = prop.title
-        
-        cell.textLabel?.text = title
-//
-        if let detailText = cell.detailTextLabel {
-            detailText.text = "\(prop.schoolName) (\(prop.city), \(prop.state))"
-//            detailText.text = prop.miniDescription
+        var cell = tableView.dequeueReusableCellWithIdentifier("UITableViewCell") as UITableViewCell?
+        if cell == nil {
+            cell = UITableViewCell(style:UITableViewCellStyle.Subtitle, reuseIdentifier:"UITableViewCell")
         }
         
-//        var cellSwitch = UISwitch(frame: CGRectZero)
-//        cell.accessoryView = cellSwitch
-        cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
+        var prop: Proposal = self.proposals[indexPath.row]
+        var title: String = prop.title
+        
+        cell!.textLabel?.text = title
 
-        return cell
+        if let detailText = cell!.detailTextLabel {
+            detailText.text = "\(prop.schoolName) (\(prop.city), \(prop.state))"
+        }
+        
+        if !prop.thumbImageURL.isEmpty {
+            let url = NSURL(string: prop.thumbImageURL)
+            cell!.imageView?.image = UIImage(named: "logo")
+            
+            if let thumbImg = prop.thumbImage {
+                cell!.imageView?.image = thumbImg
+            } else {
+                dispatch_async(dispatch_get_main_queue(), {
+                    let data = NSData(contentsOfURL: url!)
+                    let img: UIImage = UIImage(data: data!)!
+                    
+                    prop.thumbImage = img
+                    
+                    let index = find(self.proposals, prop)
+                    if let i = index {
+                        self.proposals.removeAtIndex(i)
+                        self.proposals.insert(prop, atIndex: i)
+                        tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+                        cell!.imageView?.image = prop.thumbImage
+                    }
+                    
+                })
+                
+            }
+            
+        }
+        
+        cell!.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
+
+        return cell!
     }
+    
+    
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
